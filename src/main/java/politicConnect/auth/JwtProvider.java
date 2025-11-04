@@ -1,4 +1,4 @@
-package politicConnect.auth.jwt;
+package politicConnect.auth;
 
 
 
@@ -9,10 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import politicConnect.dto.TokenDto;
+import politicConnect.repository.UserRepository;
 
-import java.security.AuthProvider;
 import java.security.Key;
 
 import java.util.Date;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class JwtProvider {
 
     private static final String ROLES_CLAIM_KEY = "roles";
+    private static final String PROVIDERS_CLAIM = "providers";
     private static final String BEARER_TYPE= "Bearer";
 
     private final Key key;
@@ -57,7 +60,7 @@ public class JwtProvider {
         //AccessToken 생성
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_VALIDITY_SECONDS);
         String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())         // payload "sub": "kakaoId"
+                .setSubject(authentication.getName())      // payload "sub": "userId"
                 .claim(ROLES_CLAIM_KEY, authorities)          // payload "roles: "common"
                 .setExpiration(accessTokenExpiresIn)          // payload "exp": 151621022 (ex)
                 .signWith(key, SignatureAlgorithm.HS512)      // header  "alg": "HS512"
