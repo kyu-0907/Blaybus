@@ -4,39 +4,54 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(name="users")
 @Data
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"provider", "provider_id"})
+        }
+)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
+    private String localLoginId;
+
+    @Column
+    private String localLoginPassword;
+
     @Column(nullable = false)
     private Role role;
 
     @Column(nullable = false)
-    private String name;
+    private String nickName;
 
-    // ✅ 지역구 필드 추가
-    @Column(nullable = false, length = 50)
-    private String district;
+    @Column(nullable = false)
+    private RegionCity regionCity;
 
-    private Instant createdAt = Instant.now();
-    private Instant updatedAt = Instant.now();
+    //로컬 로그인 시 직접입력, 소셜로그인 시 제공되는 메일 자동입₩
+    @Column(nullable = false)
+    private String email;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AuthIdentity> identities = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
+
+    @Column
+    private String providerId;
 
     /** JWT Refresh Token (optional) */
     @Column(length = 512)
     private String refreshToken;
+
+    private Instant createdAt = Instant.now();
+    private Instant updatedAt = Instant.now();
 
 }

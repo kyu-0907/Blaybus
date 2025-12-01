@@ -2,6 +2,7 @@ package politicConnect.auth;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import politicConnect.domain.Provider;
 import politicConnect.domain.User;
 
 import java.util.Collection;
@@ -23,6 +24,10 @@ public class UserDetailsImpl implements UserDetails {
 
     public Long getId() {
         return user.getId();
+    }
+
+    public Provider getProvider() {
+        return user.getProvider();
     }
 
     @Override

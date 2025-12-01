@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import politicConnect.domain.Provider;
 import politicConnect.dto.TokenDto;
 import politicConnect.repository.UserRepository;
 
@@ -49,19 +50,27 @@ public class JwtProvider {
         this.userRepository = userRepository;
     }
 
-    //authenticationr객체를 기반으로 jwtTokenDto 생성
+    //authentication객체를 기반으로 jwtTokenDto 생성
     public TokenDto generateTokenDto(Authentication authentication){
+
         String authorities= authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = new Date().getTime();
 
-        //AccessToken 생성
+        String provider = ((UserDetailsImpl) authentication.getPrincipal())
+                .getProvider()
+                .name();
+
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_VALIDITY_SECONDS);
+
+        //AccessToken 생성
+
         String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())      // payload "sub": "userId"
+                .setSubject(authentication.getName())         // payload "sub": "userId"
                 .claim(ROLES_CLAIM_KEY, authorities)          // payload "roles: "common"
+                .claim(PROVIDERS_CLAIM, provider)             // payload "providers": "LOCAL"
                 .setExpiration(accessTokenExpiresIn)          // payload "exp": 151621022 (ex)
                 .signWith(key, SignatureAlgorithm.HS512)      // header  "alg": "HS512"
                 .compact();
@@ -87,12 +96,13 @@ public class JwtProvider {
 
         String id = claims.getSubject();
 
-        User user = userRepository.findByKakaoId(id)
+        User user = userRepository.findByUserId(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         UserDetailsImpl principal = new UserDetailsImpl(user);
 
         return new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        //authentication 객체 리턴
     }
 
     public boolean validateToken(String token) {
@@ -125,5 +135,7 @@ public class JwtProvider {
             return e.getClaims();  // 만료된 경우: 예외 안 터트리고 claims만 꺼내기
         }
     }
+
+
 
 }

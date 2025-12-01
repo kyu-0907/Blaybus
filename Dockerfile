@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-bullseye AS build
+FROM eclipse-temurin:21-jdk-jammy AS build
 
 WORKDIR /app
 
