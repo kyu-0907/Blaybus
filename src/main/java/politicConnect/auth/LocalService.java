@@ -72,7 +72,7 @@ public class LocalService {
                 .regionCity(req.getRegionCity())
                 .nickName(req.getNickName())
                 .email(req.getEmail())
-                .role(Role.NORMAL)          // 기본 Role 설정
+                .role(Role.USER)          // 기본 Role 설정
                 .provider(Provider.LOCAL) // local 회원임을 기록
                 .build();
 
@@ -94,6 +94,7 @@ public class LocalService {
              * 인자가 3개인 인증된 authentication 으로 변환한다
             */
 
+            //이거 바꿔야댐(dto로 주는거 아님)
             return jwtProvider.generateTokenDto(authentication);
 
 

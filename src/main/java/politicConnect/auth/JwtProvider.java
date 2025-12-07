@@ -9,15 +9,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import politicConnect.domain.Provider;
+import politicConnect.domain.User;
 import politicConnect.dto.TokenDto;
 import politicConnect.repository.UserRepository;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.security.Key;
 
+import java.security.Principal;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -51,17 +56,26 @@ public class JwtProvider {
     }
 
     //authentication객체를 기반으로 jwtTokenDto 생성
+    //소셜은 회원가/로그인 직후에, 로컬은 로그인 이후에 회원가입 시에 user객체가 담겨있는 authentication 객체를 리턴함)
+    //authentication객체는 로컬은 usernamepasswordauthenticationToken, 소셜은 OAuth2AuthenticationToken 임.
+
     public TokenDto generateTokenDto(Authentication authentication){
+
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
 
         String authorities= authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+        String userId = principal.getName(); //유저아이디
+
+        // 3. Provider (Enum -> String)
+        // Enum 타입이므로 .name()을 호출하여 "LOCAL" 또는 "KAKAO" 같은 문자열로 바꿉니다.
+        String provider = principal.getUser().getProvider().name();
+
+
         long now = new Date().getTime();
 
-        String provider = ((UserDetailsImpl) authentication.getPrincipal())
-                .getProvider()
-                .name();
 
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_VALIDITY_SECONDS);
 
@@ -94,12 +108,15 @@ public class JwtProvider {
 
         Claims claims = parseClaims(accessToken);
 
-        String id = claims.getSubject();
+        String userId = claims.getSubject();
 
-        User user = userRepository.findByUserId(id)
+        Provider provider = claims.get(PROVIDERS_CLAIM, Provider.class);
+        //여기서 provider도 화인해야함, 추가로 userRepository를 뒤져서 찾아야 함 -> 어떤 소셜계정 혹은 local 의 id인지 확인해야 하기 때문에
+
+        User user = userRepository.findByProviderAndUserId(provider,userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        UserDetailsImpl principal = new UserDetailsImpl(user);
+        PrincipalDetails principal = new PrincipalDetails(user);
 
         return new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         //authentication 객체 리턴
@@ -120,6 +137,7 @@ public class JwtProvider {
         }
         return false;
     }
+
 
 
 

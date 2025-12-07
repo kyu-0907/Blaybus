@@ -7,8 +7,6 @@ import java.time.Instant;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 @Data
 @Table(
         name = "users",
@@ -16,6 +14,10 @@ import java.time.Instant;
                 @UniqueConstraint(columnNames = {"provider", "provider_id"})
         }
 )
+
+@Builder
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
