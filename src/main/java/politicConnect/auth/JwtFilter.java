@@ -27,17 +27,24 @@ import java.io.IOException;
         @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
-            // Request Header 에서 토큰을 꺼냄
-            String jwt = resolveToken(request);
-
             String path = request.getRequestURI();
-            if (path.startsWith("/oauth2/") || path.startsWith("/auth/")) {
+
+            // [수정] 스웨거 관련 경로도 필터 로직을 건너뛰도록 추가
+            if (path.startsWith("/oauth2/") ||
+                    path.startsWith("/auth/") ||
+                    path.startsWith("/swagger-ui") ||
+                    path.startsWith("/v3/api-docs") ||
+                    path.startsWith("/swagger-resources") ||
+                    path.startsWith("/favicon.ico")) {
+
                 filterChain.doFilter(request, response);
-                return;
+                return; // 여기서 메서드 종료! 밑에 토큰 검사 로직 실행 안 됨
             }
 
+            // --- 기존 로직 ---
+            String jwt = resolveToken(request);
+
             // validateToken 으로 토큰 유효성 검사
-            // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
             if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
                 Authentication authentication = jwtProvider.getAuthentication(jwt);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
