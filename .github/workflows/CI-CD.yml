@@ -47,12 +47,17 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: GITHUB_SHA
           script: |
-            # (1) 기존 컨테이너 중지/삭제 (에러 무시)
-            # 프로젝트 이름을 명시하지 않으면 못 찾을 수 있으므로 강제 삭제 시도
-            sudo docker rm -f pc_app || true
             
-            # (2) .env 파일 생성
-            # 🚨 [추가됨] 프로젝트 이름을 환경변수 파일에 고정 
+            
+            # 1. 확실하게 홈 디렉토리로 이동
+            cd /home/gyuhoh2
+            
+            # 2. 기존 .env 삭제 후 재생성 (덮어쓰기 보장)
+            rm -f .env
+            
+      
+            
+            # 환경변수 주입
             echo "COMPOSE_PROJECT_NAME=pc" > .env
             
             # 나머지 변수들 (이어쓰기 >>)
@@ -67,16 +72,13 @@ jobs:
             echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
             echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
             echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
-              
-            # (3) 로그인 & 풀 
+            
+            
+            
+            SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pc:${GITHUB_SHA::7}
-            sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/pc:${GITHUB_SHA::7} pc:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pc:${SHORT_SHA}
+            sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/pc:${SHORT_SHA} pc:latest
             
-            # (4) 실행
-            # 🚨 [변경] docker-compose (하이픈) -> docker compose (공백)
-            # 🚨 [변경] -p pc 옵션 제거 (위의 .env 파일에서 자동으로 읽음)
-            sudo docker compose up -d
-            
-            # (5) 청소
-            sudo docker image prune -f
+            sudo docker compose down
+            sudo docker compose up -d --force-recreate
