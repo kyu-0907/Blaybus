@@ -47,38 +47,34 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: GITHUB_SHA
           script: |
+             cd /home/gyuhoh2
             
+             # (1) sudo tee를 사용해 .env를 한 번에 생성 (권한 무시 및 덮어쓰기)
+             # <<EOF 부터 마지막 EOF 사이의 내용이 그대로 .env에 들어갑니다.
+             sudo tee .env <<EOF > /dev/null
+             COMPOSE_PROJECT_NAME=pc
+             REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+             DB_URL=${{ secrets.DB_URL }}
+             DB_USERNAME=${{ secrets.DB_USERNAME }}
+             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+             JWT_SECRET=${{ secrets.JWT_SECRET }}
+             KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+             KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
+             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+             NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}
+             NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}
+             EOF
             
-            # 1. 확실하게 홈 디렉토리로 이동
-            cd /home/gyuhoh2
+             # (2) 이미지 업데이트
+             SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
+             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pc:${SHORT_SHA}
+             sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/pc:${SHORT_SHA} pc:latest
             
-            # 2. 기존 .env 삭제 후 재생성 (덮어쓰기 보장)
-            rm -f .env
+             # (3) 재시작 (새로운 .env 적용을 위해 down 후 up)
+             sudo docker compose down
+             sudo docker compose up -d --force-recreate
             
-      
-            
-            # 환경변수 주입
-            echo "COMPOSE_PROJECT_NAME=pc" > .env
-            
-            # 나머지 변수들 (이어쓰기 >>)
-            echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> .env
-            echo "DB_URL=${{ secrets.DB_URL }}" >> .env
-            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-            echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
-            echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> .env
-            echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
-            echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
-            echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
-            echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
-            
-            
-            
-            SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
-            sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pc:${SHORT_SHA}
-            sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/pc:${SHORT_SHA} pc:latest
-            
-            sudo docker compose down
-            sudo docker compose up -d --force-recreate
+             # (4) 정리
+             sudo docker image prune -f
