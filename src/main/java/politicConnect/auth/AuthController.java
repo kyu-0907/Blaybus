@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
+
     private final LocalService localService;
     private final SocialLoginService socialLoginService;
 
@@ -46,7 +47,7 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(responseBody);
 
-        //테스터
+        //테스터1
     }
 
     @PostMapping("/reissue")
