@@ -99,7 +99,6 @@ public class LocalService {
             RefreshToken refreshToken = new RefreshToken(authentication.getName(), tokenDto.getRefreshToken());
             refreshTokenRepository.save(refreshToken);
 
-
             return tokenDto;
 
 

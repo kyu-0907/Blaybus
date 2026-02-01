@@ -67,8 +67,8 @@ jobs:
             echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
             echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env
             echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env
-            
-            # (3) 로그인 & 풀
+              
+            # (3) 로그인 & 풀 
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pc:${GITHUB_SHA::7}
             sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/pc:${GITHUB_SHA::7} pc:latest

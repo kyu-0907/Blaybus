@@ -22,6 +22,7 @@ public class AuthController {
 
         localService.localSignUp(request);
 
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("회원가입이 완료되었습니다");

@@ -33,6 +33,8 @@ public class SurveyService {
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
+
+
         // 2. 설문 조회
         Survey survey = surveyRepository.findById(request.getSurveyId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 설문입니다."));
