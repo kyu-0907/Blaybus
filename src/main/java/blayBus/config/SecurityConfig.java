@@ -38,18 +38,11 @@ import org.springframework.security.web.SecurityFilterChain;
             http
                     // 요청 권한 설정
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers(
-                                    "/auth/**",
-                                    "/swagger-ui/**",
-                                    "/swagger-ui.html",
-                                    "/swagger-ui/index.html",
-                                    "/v3/api-docs/**",
-                                    "/swagger-resources/**",
-                                    "/webjars/**",
-                                    "/favicon.ico"
-                            ).permitAll()
+                                    // 모든 요청(/**)을 허용(permitAll)하겠다는 설정입니다.
+                                    .requestMatchers("/**").permitAll()
                             .anyRequest().authenticated()
                     )
+
                     // CSRF 완전히 비활성화
                     .csrf(AbstractHttpConfigurer::disable)
                     .formLogin(AbstractHttpConfigurer::disable)
