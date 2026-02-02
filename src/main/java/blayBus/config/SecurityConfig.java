@@ -11,20 +11,14 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import politicConnect.auth.CustomOAuth2UserService;
-import politicConnect.auth.JwtFilter;
-import politicConnect.auth.JwtProvider;
-import politicConnect.auth.OAuth2SuccessHandler;
+
 
     @Configuration
     @EnableWebSecurity
     @RequiredArgsConstructor
     public class SecurityConfig {
 
-        private final JwtProvider jwtProvider;
-        private final CustomOAuth2UserService customOAuth2UserService;
-        private final OAuth2SuccessHandler oAuth2SuccessHandler;
+
 
 
 
