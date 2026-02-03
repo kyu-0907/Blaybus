@@ -1,4 +1,4 @@
-package blayBus.user;
+package blayBus.user.domain;
 
 public enum UserRole {
     MENTOR,

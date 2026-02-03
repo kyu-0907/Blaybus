@@ -1,6 +1,6 @@
 package blayBus.mentorMenteeRelation;
 
-import blayBus.user.User;
+import blayBus.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 

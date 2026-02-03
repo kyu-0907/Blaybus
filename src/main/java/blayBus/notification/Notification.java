@@ -1,6 +1,6 @@
 package blayBus.notification;
 
-import blayBus.user.User;
+import blayBus.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
