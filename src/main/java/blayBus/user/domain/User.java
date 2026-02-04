@@ -22,18 +22,16 @@ public class User {
     private UserRole role;
 
     public static User createMentor(String name) {
-        Assert.hasText(name, "Name must not be empty");
-
         return new User(name, UserRole.MENTOR);
     }
 
     public static User createMentee(String name) {
-        Assert.hasText(name, "Name must not be empty");
-
         return new User(name, UserRole.MENTEE);
     }
 
     private User(String name, UserRole role) {
+        Assert.hasText(name, "Name must not be empty");
+
         this.name = name;
         this.role = role;
     }
