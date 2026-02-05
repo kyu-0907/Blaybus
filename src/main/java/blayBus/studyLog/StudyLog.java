@@ -1,6 +1,6 @@
 package blayBus.studyLog;
 
-import blayBus.task.Task;
+import blayBus.task.domain.Task;
 import jakarta.persistence.*;
 import lombok.*;
 
