@@ -10,3 +10,8 @@ spring:
       ddl-auto: create-drop
     show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
+
+jwt:
+  secret: your_local_secret_key_at_least_32_characters_long_!
+  access-token-validity: 3600000
+  refresh-token-validity: 604800000
