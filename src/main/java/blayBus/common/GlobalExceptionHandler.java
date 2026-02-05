@@ -1,6 +1,6 @@
 package blayBus.common;
 
-import blayBus.user.application.exception.UserNotFoundException;
+import blayBus.common.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 package blayBus.user.application;
 
-import blayBus.user.application.exception.UserNotFoundException;
+import blayBus.common.exception.UserNotFoundException;
 import blayBus.user.application.request.UserCreateCommand;
 import blayBus.user.domain.User;
 import blayBus.user.domain.UserRepository;

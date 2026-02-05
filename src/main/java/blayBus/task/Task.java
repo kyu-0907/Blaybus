@@ -1,6 +1,6 @@
 package blayBus.task;
 
-import blayBus.planner.Planner;
+import blayBus.planner.domain.Planner;
 import jakarta.persistence.*;
 import lombok.*;
 
