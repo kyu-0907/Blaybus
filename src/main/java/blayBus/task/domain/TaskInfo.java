@@ -9,13 +9,11 @@ public record TaskInfo(
         String title,
         String goal,
         Subject subject,
-        String filename,
         User author
 ) {
     public static TaskInfo of(
             Planner planner,
             TaskCreateCommand taskCreateCommand,
-            String filename,
             User author
     ) {
         return new TaskInfo(
@@ -23,7 +21,6 @@ public record TaskInfo(
                 taskCreateCommand.title(),
                 taskCreateCommand.goal(),
                 taskCreateCommand.subject(),
-                filename,
                 author
         );
     }

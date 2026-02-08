@@ -1,11 +1,15 @@
 package blayBus.task.domain;
 
+import blayBus.material.domain.Material;
 import blayBus.planner.domain.Planner;
 import blayBus.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,11 +33,12 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
-    private String filename;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User author;
+
+    @OneToMany(mappedBy = "task")
+    private List<Material> materials = new ArrayList<>();
 
     public static Task create(TaskInfo taskInfo) {
         Task task = new Task();
@@ -43,7 +48,6 @@ public class Task {
         task.goal = taskInfo.goal();
         task.subject = taskInfo.subject();
         task.status = TaskStatus.TODO;
-        task.filename = taskInfo.filename();
         task.author = taskInfo.author();
 
         return task;

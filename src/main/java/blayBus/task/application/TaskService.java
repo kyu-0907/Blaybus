@@ -10,11 +10,12 @@ import blayBus.task.domain.TaskRepository;
 import blayBus.user.domain.User;
 import blayBus.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,25 +24,27 @@ public class TaskService {
     private final UserRepository userRepository;
     private final PlannerRepository plannerRepository;
     private final TaskRepository taskRepository;
-    private final FileStore fileStore;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public Task createTask(Long authorId, TaskCreateCommand command, MultipartFile file) throws IOException {
+    public Task createTask(Long authorId, TaskCreateCommand command, List<MultipartFile> files) {
         User author = findUser(authorId);
         User assignee = findUser(command.assigneeId());
 
         Planner planner = findOrCreatePlanner(command, assignee);
 
-        String filename = fileStore.storeFile(file);
+        Task task = taskRepository.save(Task.create(TaskInfo.of(planner, command, author)));
 
-        Task task = Task.create(TaskInfo.of(
-                planner,
-                command,
-                filename,
-                author
-        ));
+        if (files != null && !files.isEmpty()) {
+            eventPublisher.publishEvent(new TaskCreateEvent(task.getId(), files));
+        }
 
-        return taskRepository.save(task);
+        return task;
+    }
+
+    public Task findTask(Long taskId) {
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
     }
 
     private User findUser(Long userId) {
