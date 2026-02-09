@@ -40,6 +40,9 @@ public class Task {
     @OneToMany(mappedBy = "task")
     private List<Material> materials = new ArrayList<>();
 
+    private String filename;
+
+
     public static Task create(TaskInfo taskInfo) {
         Task task = new Task();
 
@@ -49,6 +52,7 @@ public class Task {
         task.subject = taskInfo.subject();
         task.status = TaskStatus.TODO;
         task.author = taskInfo.author();
+
 
         return task;
     }

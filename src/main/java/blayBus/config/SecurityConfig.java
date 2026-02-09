@@ -33,10 +33,18 @@ public class SecurityConfig {
     }
 
     @Bean
+
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
+                        // 1. 인증 없이 허용할 경로 추가
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        // 2. Swagger 관련 리소스 경로 허용 (필수)
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)

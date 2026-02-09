@@ -12,12 +12,20 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
-
   redis:
     image: redis:alpine
     container_name: redis-container
     ports:
       - "6379:6379"
+
+  # GCS 에뮬레이터 추가
+  gcs-emulator:
+    image: fsouza/fake-gcs-server
+    container_name: gcs-emulator
+    ports:
+      - "4443:4443"
+    # 시작 시 http 모드로 실행하고, 기본 버킷을 생성함
+    command: -scheme http -external-url http://localhost:4443
 
 volumes:
   mysql-data:
